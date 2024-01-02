@@ -57,19 +57,32 @@ namespace url_shorter.Controllers
 
                 try
                 {
-
-
                     // verify url starts with http
-                    if (!url.Contains("http") && url != null)
+                    if (!url.Contains("http"))
                     {
                         url = "http://" + url;
                     }
                     else if (url == null)
                     {
-                        Console.WriteLine("Url is a null value " + url);
+                        throw new Exception("Url is null");
+                    }
+
+
+                    // check if url is valid
+                    Shorterner shortUrl = new Shorterner(url);
+                    bool isUrlValid = shortUrl.Checkurl(url);
+
+                    if (!isUrlValid)
+                    {
+                        Response.StatusCode = 400;
+                        return Json(new URLResponse()
+                        {
+                            url = url,
+                            status = "Not a valid URL",
+                            token = null
+                        });
                     }
                     if (DB.Exists(u => u.ShortenedURL == url))
-                    // if (new LiteDB.LiteDatabase("Data/Urls.db").GetCollection<NixURL>().Exists(u => u.ShortenedURL == url))
                     {
                         Response.StatusCode = 405;
                         return Json(new URLResponse()
@@ -79,9 +92,6 @@ namespace url_shorter.Controllers
                             token = null
                         });
                     }
-
-
-                    Shorterner shortUrl = new Shorterner(url);
                     // Shorten the URL by calling new Shortener(url) and return the token as a JSON string.
                     return Json(shortUrl.Token);
                 }
@@ -131,13 +141,28 @@ namespace url_shorter.Controllers
                 }
             }
         }
-
         //TODO sanity checks, make sure url does not exist and stuff like that
         [HttpPost, Route("/shorten")]
         public IActionResult ShortenUrl([FromBody] ShortenRequest request)
         {
             var originalUrl = request.Url;
             var desiredToken = request.Token;
+
+            Shorterner shortUrlChecker = new Shorterner(originalUrl);
+            bool isUrlValid = shortUrlChecker.Checkurl(originalUrl);
+
+
+            if (!isUrlValid)
+            {
+                Response.StatusCode = 400;
+                return Json(new URLResponse()
+                {
+                    url = originalUrl,
+                    status = "Not a valid URL",
+                    token = null
+                });
+            }
+
 
             if (originalUrl == null || desiredToken == null)
             {
@@ -170,22 +195,6 @@ namespace url_shorter.Controllers
             }
         }
 
-        /*
-
-        private string FindRedirect(string url)
-        {
-            string Result = string.Empty;
-            using (var client = new HttpClient())
-            {
-                var response = client.GetAsync(url).Result;
-                if (response.IsSuccessStatusCode && response is not null)
-                {
-                    Result = response.Headers.Location.ToString();
-                }
-            }
-            return Result;
-        }
-        */
     }
 }
 

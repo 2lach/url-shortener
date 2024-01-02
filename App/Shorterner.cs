@@ -1,6 +1,8 @@
 ﻿using LiteDB;
 using System;
-using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
+
 
 namespace url_shortener.App
 {
@@ -44,6 +46,45 @@ namespace url_shortener.App
             return this;
         }
 
+        public bool CheckUrlExists(string url)
+        {
+            try
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    // Send an HTTP HEAD request to the URL (HEAD request only retrieves headers, not the full content)
+                    var response = httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Head, url)).Result;
+
+                    // Check if the response status code indicates success (2xx range)
+                    return response.IsSuccessStatusCode;
+                }
+            }
+            catch (Exception)
+            {
+                // nope
+                return false;
+            }
+        }
+
+
+        public bool Checkurl(string url)
+        {
+            bool urlExists = CheckUrlExists(url);
+            bool result;
+            if (urlExists)
+            {
+                Uri uriResult;
+                result = Uri.TryCreate(url, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+
+            }
+            else
+            {
+                Console.WriteLine("URL does not exist or is not reachable.");
+                result = false;
+            }
+            return result;
+        }
+
         public Shorterner(string url)
         {
             string dbPath = new AppConf().Config.DB_PATH;
@@ -69,9 +110,12 @@ namespace url_shortener.App
                 {
                     throw new Exception("Url already Exists");
                 }
+
                 urls.Insert(biturl);
             }
+
         }
+
     }
 }
 
