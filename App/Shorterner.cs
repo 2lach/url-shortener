@@ -49,7 +49,6 @@ namespace url_shortener.App
             string dbPath = new AppConf().Config.DB_PATH;
             using (var db = new LiteDatabase(dbPath))
             {
-                Console.WriteLine(dbPath);
                 // Get a collection (or create, if doesn't exist)
                 // var col = db.GetCollection<Customer>("customers");
 

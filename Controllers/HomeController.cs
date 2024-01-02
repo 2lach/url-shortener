@@ -1,5 +1,7 @@
+using System;
 using LiteDB;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using url_shortener.App;
 
 
@@ -14,9 +16,17 @@ namespace url_shorter.Controllers
     }
 
 
+    public class ShortenRequest
+    {
+        public string Url { get; set; }
+        public string Token { get; set; }
+    }
+
+
     public class HomeController : Controller
     {
         string dbPath = new AppConf().Config.DB_PATH;
+        private ShortUrl biturl;
 
         // Index Route
         [HttpGet, Route("/")]
@@ -118,6 +128,44 @@ namespace url_shorter.Controllers
                     // You can return a specific error message or redirect to a default URL.
                     // For example:
                     return NotFound("URL not found for the provided token.");
+                }
+            }
+        }
+
+
+        [HttpPost, Route("/shorten")]
+        public IActionResult ShortenUrl([FromBody] ShortenRequest request)
+        {
+            var originalUrl = request.Url;
+            var desiredToken = request.Token;
+
+            if (originalUrl == null || desiredToken == null)
+            {
+                throw new Exception("No null values motherfucker");
+            }
+
+            string dbPath = new AppConf().Config.DB_PATH;
+            using (var db = new LiteDatabase(dbPath))
+            {
+                try
+                {
+                    var urls = db.GetCollection<ShortUrl>();
+
+                    biturl = new ShortUrl()
+                    {
+                        Token = desiredToken,
+                        URL = originalUrl,
+                        ShortenedURL = new AppConf().Config.BASE_URL + desiredToken
+                    };
+
+                    string shortenedUrl = new AppConf().Config.BASE_URL + desiredToken;
+                    urls.Insert(biturl);
+                    return Json(new { shortenedUrl });
+
+                }
+                catch (Exception error)
+                {
+                    throw new Exception("Oh shit..." + error);
                 }
             }
         }
