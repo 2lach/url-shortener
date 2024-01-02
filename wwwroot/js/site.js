@@ -17,6 +17,7 @@ function originalUrl(url) {
         });
 
     getUrls();
+    clearInput();
 }
 
 let isTablePopulated = false;
@@ -120,6 +121,7 @@ function customUrl(url, token) {
             .then(data => {
                 console.log(data);
             });
+            clearInput();
     } else {
         console.log('in else so exiting...')
         return;
@@ -135,9 +137,7 @@ getUrlBtn.addEventListener('click', function () {
 submitBtn.addEventListener('click', function () {
     let url = urlInput.value;
     let desiredtoken = desiredToken.value;
-    console.log(url.length)
-    console.log(desiredToken.length)
-    if (url != null && desiredtoken.length < 4) {
+    if (url != null && desiredtoken.length <= 4) {
         originalUrl(url);
     } else if (url != null && desiredtoken != null) {
         customUrl(url, desiredtoken);
@@ -146,6 +146,14 @@ submitBtn.addEventListener('click', function () {
     }
 });
 
+
+function clearInput() {
+ // let a sec pass before clearing input
+    setTimeout(function () {
+    urlInput.value = '';
+    desiredToken.value = '';
+    }, 1000);
+}
 
 // run getUrls() every 5 seconds
 setInterval(function () {
