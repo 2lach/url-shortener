@@ -141,7 +141,6 @@ namespace url_shorter.Controllers
                 }
             }
         }
-        //TODO sanity checks, make sure url does not exist and stuff like that
         [HttpPost, Route("/shorten")]
         public IActionResult ShortenUrl([FromBody] ShortenRequest request)
         {
