@@ -1,3 +1,4 @@
 ﻿{
-  "base_url": "https://localhost:7242/"
+  "base_url": "https://localhost:7242/",
+  "db_path": "/Users/stefan/projects/csharp/url-shortener/Data/Urls.db"
 }

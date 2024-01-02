@@ -46,8 +46,10 @@ namespace url_shortener.App
 
         public Shorterner(string url)
         {
-            using (var db = new LiteDatabase(@"/Users/stefan/projects/csharp/url-shortener/Data/Urls.db"))
+            string dbPath = new AppConf().Config.DB_PATH;
+            using (var db = new LiteDatabase(dbPath))
             {
+                Console.WriteLine(dbPath);
                 // Get a collection (or create, if doesn't exist)
                 // var col = db.GetCollection<Customer>("customers");
 

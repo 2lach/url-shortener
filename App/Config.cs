@@ -10,8 +10,8 @@ namespace url_shortener.App
     public class Config
     {
         public string BASE_URL;
+        public string DB_PATH;
     }
-    // NixConf
     public class AppConf
     {
         public Config Config;
