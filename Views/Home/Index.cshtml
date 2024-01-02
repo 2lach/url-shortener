@@ -1,16 +1,23 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
-<div class="shortener-form-wrap">
+<div class="shortener-form-wrap bg-img">
     <section class="shortener-form">
         <h2>Enter your link below and get it shortened, nice and easy.</h2>
         <div class="input-wrap">
-            <input type="text"
-                   name="url"
-                   id="urlshort"
-                   placeholder="Shorten your URL" /><button id="submit">Shorten</button>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-default">➤</span>
+                <input type="text"
+                       name="url"
+                       id="urlshort"
+                       aria-describedby="inputGroup-sizing-default"
+                       placeholder="Shorten your URL" />
+                <button id="submit" class="btn btn-primary">Shorten</button>
+            </div>
+
+
         </div>
-        <button id="getUrls">Get existing Url</button>
+        <button id="getUrls" class="btn btn-secondary">Get existing Urls</button>
         <div class="resp-area inactive" id="resp-area"></div>
 
         <div id="urlList"><hr /></div>

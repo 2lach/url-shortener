@@ -16,6 +16,7 @@ namespace url_shorter.Controllers
 
     public class HomeController : Controller
     {
+        string dbPath = new AppConf().Config.DB_PATH;
 
         // Index Route
         [HttpGet, Route("/")]
@@ -26,7 +27,7 @@ namespace url_shorter.Controllers
         [HttpGet, Route("/all")]
         public IActionResult GetAllUrls()
         {
-            using (var liteDb = new LiteDatabase(@"/Users/stefan/projects/csharp/url-shortener/Data/Urls.db"))
+            using (var liteDb = new LiteDatabase(dbPath))
             {
                 var collection = liteDb.GetCollection<ShortUrl>();
                 var allUrls = collection.FindAll().ToList();
@@ -40,7 +41,7 @@ namespace url_shorter.Controllers
         public IActionResult PostURL([FromBody] string url)
         {
 
-            using (var liteDb = new LiteDatabase(@"/Users/stefan/projects/csharp/url-shortener/Data/Urls.db"))
+            using (var liteDb = new LiteDatabase(dbPath))
             {
                 var DB = liteDb.GetCollection<ShortUrl>();
 
@@ -101,7 +102,7 @@ namespace url_shorter.Controllers
         [HttpGet, Route("/{token}")]
         public IActionResult UrlRedirect([FromRoute] string token)
         {
-            using (var liteDb = new LiteDatabase(@"/Users/stefan/projects/csharp/url-shortener/Data/Urls.db"))
+            using (var liteDb = new LiteDatabase(dbPath))
             {
                 var db = liteDb;
                 var collection = db.GetCollection<ShortUrl>();
@@ -121,7 +122,7 @@ namespace url_shorter.Controllers
             }
         }
 
-
+        /*
 
         private string FindRedirect(string url)
         {
@@ -136,6 +137,7 @@ namespace url_shorter.Controllers
             }
             return Result;
         }
+        */
     }
 }
 
