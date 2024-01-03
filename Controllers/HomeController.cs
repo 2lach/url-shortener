@@ -10,9 +10,9 @@ namespace url_shorter.Controllers
 {
     public class URLResponse
     {
-        public string url { get; set; }
-        public string status { get; set; }
-        public string token { get; set; }
+        public string? url { get; set; }
+        public string? status { get; set; }
+        public string? token { get; set; }
     }
 
 
@@ -146,7 +146,7 @@ namespace url_shorter.Controllers
         {
             var originalUrl = request.Url;
             var desiredToken = request.Token;
-
+            // here it runs all the Shorterner code and creates a trow-away token which it inserts into db seems like a waste
             Shorterner shortUrlChecker = new Shorterner(originalUrl);
             bool isUrlValid = shortUrlChecker.Checkurl(originalUrl);
 
@@ -162,35 +162,25 @@ namespace url_shorter.Controllers
                 });
             }
 
-
+            // this is basically overkill and should not happen
             if (originalUrl == null || desiredToken == null)
             {
                 throw new Exception("No null values motherfucker");
             }
 
-            string dbPath = new AppConf().Config.DB_PATH;
             using (var db = new LiteDatabase(dbPath))
             {
-                try
+                var urls = db.GetCollection<ShortUrl>();
+
+                biturl = new ShortUrl()
                 {
-                    var urls = db.GetCollection<ShortUrl>();
+                    Token = desiredToken,
+                    URL = originalUrl,
+                    ShortenedURL = new AppConf().Config.BASE_URL + desiredToken
+                };
 
-                    biturl = new ShortUrl()
-                    {
-                        Token = desiredToken,
-                        URL = originalUrl,
-                        ShortenedURL = new AppConf().Config.BASE_URL + desiredToken
-                    };
-
-                    string shortenedUrl = new AppConf().Config.BASE_URL + desiredToken;
-                    urls.Insert(biturl);
-                    return Json(new { shortenedUrl });
-
-                }
-                catch (Exception error)
-                {
-                    throw new Exception("Oh shit..." + error);
-                }
+                urls.Insert(biturl);
+                return Json(new { biturl.ShortenedURL });
             }
         }
 
